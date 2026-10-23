@@ -1,0 +1,36 @@
+# SaltStack MCP Server Configuration File
+auth:
+  # Options:
+  # - "read_only": Only inspection tools allowed (ping, grains, pillar, jobs)
+  # - "safe_ops": Execution and state allowed with safety guards and dry-run defaults
+  # - "full_admin": All tools allowed without mandatory dry-run
+  mode: "safe_ops"
+
+target_filters:
+  # Allowed minion patterns (wildcard or glob)
+  allowed:
+    - "*"
+  # Strictly forbidden minion patterns (evaluated with priority over allowed)
+  denied:
+    - "prod-*"
+    - "database-primary-*"
+
+safety_rules:
+  # Require state.apply to run in test=True mode unless confirm_live_run=True is set
+  require_dry_run_first: true
+
+  # Command patterns prohibited in salt_run_command
+  cmd_denylist:
+    - "rm -rf /"
+    - "rm -rf /*"
+    - "mkfs"
+    - "dd if="
+    - "shutdown"
+    - "reboot"
+    - "init 0"
+    - "init 6"
+    - ":(){ :|:& };:"
+
+audit:
+  enabled: true
+  log_file: "salt-mcp-audit.jsonl"
